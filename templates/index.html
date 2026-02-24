@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ficha RP Jujutsu</title>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: white;
+            font-family: Arial;
+        }
+        input, textarea {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 6px;
+        }
+        .box {
+            width: 500px;
+            margin: auto;
+        }
+        button {
+            background: crimson;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>Ficha RP - Jujutsu</h1>
+
+    <form method="POST">
+
+        <label>Nível:</label>
+        <input type="text" name="nivel">
+
+        <label>Clã:</label>
+        <input type="text" name="cla">
+
+        <label>Nome:</label>
+        <input type="text" name="nome">
+
+        <label>Idade:</label>
+        <input type="text" name="idade">
+
+        <label>Raça:</label>
+        <input type="text" name="raca">
+
+        <label>Técnica:</label>
+        <input type="text" name="tecnica">
+
+        <label>Características:</label>
+        <textarea name="caracteristicas"></textarea>
+
+        <label>Habilidades da Técnica:</label>
+        <textarea name="habilidades"></textarea>
+
+        <button type="submit">Criar Ficha</button>
+
+    </form>
+
+    {% if dados %}
+        <hr>
+        <h2>Ficha Criada:</h2>
+        <p><b>Nível:</b> {{ dados.nivel }}</p>
+        <p><b>Clã:</b> {{ dados.cla }}</p>
+        <p><b>Nome:</b> {{ dados.nome }}</p>
+        <p><b>Idade:</b> {{ dados.idade }}</p>
+        <p><b>Raça:</b> {{ dados.raca }}</p>
+        <p><b>Técnica:</b> {{ dados.tecnica }}</p>
+        <p><b>Características:</b> {{ dados.caracteristicas }}</p>
+        <p><b>Habilidades:</b> {{ dados.habilidades }}</p>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
