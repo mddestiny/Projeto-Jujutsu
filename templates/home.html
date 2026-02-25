@@ -104,40 +104,26 @@
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
-        document.getElementById('rolar-dados')?.addEventListener('click', async function() {
-            this.textContent = '🎲 Rolando...';
-            this.disabled = true;
-            
-            try {
-                const response = await fetch('/api/rolar-dados');
-                const dados = await response.json();
+        const botaoRolar = document.getElementById('rolar-dados');
+        if (botaoRolar) {
+            botaoRolar.addEventListener('click', function() {
+                this.textContent = '🎲 Rolando...';
+                this.disabled = true;
                 
-                // Animar mudança de valores
-                const campos = {
-                    'forca': dados.forca,
-                    'agilidade': dados.agilidade,
-                    'defesa': dados.defesa,
-                    'energia': dados.energia
-                };
-                
-                for (let [campo, valor] of Object.entries(campos)) {
-                    const input = document.getElementById(campo);
-                    if (input) {
-                        input.style.transition = 'all 0.3s';
-                        input.style.background = 'rgba(255, 100, 100, 0.5)';
-                        input.value = valor;
-                        setTimeout(() => {
-                            input.style.background = 'rgba(20, 20, 20, 0.9)';
-                        }, 300);
-                    }
-                }
-            } catch(err) {
-                console.error('Erro ao rolar dados:', err);
-            }
-            
-            this.textContent = '🎲 Rolar Dados';
-            this.disabled = false;
-        });
+                fetch('/api/rolar-dados')
+                    .then(r => r.json())
+                    .then(dados => {
+                        document.getElementById('forca').value = dados.forca;
+                        document.getElementById('agilidade').value = dados.agilidade;
+                        document.getElementById('defesa').value = dados.defesa;
+                        document.getElementById('energia').value = dados.energia;
+                    })
+                    .finally(() => {
+                        this.textContent = '🎲 Rolar Dados';
+                        this.disabled = false;
+                    });
+            });
+        }
     </script>
 </body>
 </html>
