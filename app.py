@@ -43,10 +43,38 @@ class Ficha(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# Debug endpoint
+# Debug endpoints
 @app.route("/test")
 def test():
     return "<h1>Flask está funcionando!</h1>"
+
+@app.route("/test-login-html")
+def test_login_html():
+    html = """<!DOCTYPE html>
+<html>
+<head><title>Login Teste</title></head>
+<body style="background: black; color: white; padding: 20px;">
+<h1>LOGIN TESTE - HTML DIRETO</h1>
+<form method="POST">
+    <input type="text" name="username" placeholder="usuario" required>
+    <input type="password" name="password" placeholder="senha" required>
+    <button type="submit">Entrar</button>
+</form>
+</body>
+</html>"""
+    return html
+
+@app.route("/debug")
+def debug_info():
+    import os
+    template_path = os.path.join(os.path.dirname(__file__), 'templates')
+    files = os.listdir(template_path) if os.path.exists(template_path) else "NÃO ENCONTRADO"
+    return f"""
+    <h1>DEBUG INFO</h1>
+    <p>Template Path: {template_path}</p>
+    <p>Files: {files}</p>
+    <p>PWD: {os.getcwd()}</p>
+    """
 
 # -----------------------------
 # Rotas de autenticação
