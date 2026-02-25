@@ -189,7 +189,10 @@
         <!-- HEADER -->
         <div class="header">
             <h1>⚔️ Fichas C.R.I.S. - Ordem Paranormal</h1>
-            <a href="/logout">🚪 Logout</a>
+            <div style="display: flex; gap: 10px;">
+                <a href="/compendio">📚 Compêndio</a>
+                <a href="/logout">🚪 Logout</a>
+            </div>
         </div>
 
         <!-- CRIAR FICHA -->
@@ -230,8 +233,31 @@
                         <input type="number" name="agilidade" value="10">
                     </div>
                     <div class="form-group">
-                        <label>Especial</label>
+                        <label>Especialidade</label>
                         <input type="text" name="especial" placeholder="Habilidade especial">
+                    </div>
+                    <div class="form-group">
+                        <label>Trilha Jujutsu</label>
+                        <select name="trilha" style="background: #1a1a2e; color: #e0e0e0; padding: 10px; border: 1px solid #444; border-radius: 5px;">
+                            <option value="Iniciante">🔰 Iniciante</option>
+                            <option value="Discente">📚 Discente</option>
+                            <option value="Especial">✨ Especial</option>
+                            <option value="Feiticeiro">🧙 Feiticeiro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Clã Jujutsu</label>
+                        <input type="text" name="clan" placeholder="Ex: Clã Gojo, Clã Zenin..." style="background: #1a1a2e; color: #e0e0e0; padding: 10px; border: 1px solid #444; border-radius: 5px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Elemento Paranormal</label>
+                        <select name="elemento" style="background: #1a1a2e; color: #e0e0e0; padding: 10px; border: 1px solid #444; border-radius: 5px;">
+                            <option value="Conhecimento">📖 Conhecimento</option>
+                            <option value="Energia">⚡ Energia</option>
+                            <option value="Sangue">🩸 Sangue</option>
+                            <option value="Morte">💀 Morte</option>
+                            <option value="Medo">😱 Medo</option>
+                        </select>
                     </div>
                 </div>
                 <button type="submit">✨ Criar Personagem</button>
@@ -286,7 +312,10 @@
                         </div>
 
                         <small><strong>Nível:</strong> {{ ficha.nivel }}</small><br>
-                        <small><strong>Técnica:</strong> {{ ficha.tecnica }}</small>
+                        <small><strong>Técnica:</strong> {{ ficha.tecnica }}</small><br>
+                        <small><strong>Trilha:</strong> {{ ficha.trilha }}</small>
+                        {% if ficha.clan %}<br><small><strong>Clã:</strong> {{ ficha.clan }}</small>{% endif %}
+                        <small style="display: block; color: #4a90e2; margin-top: 5px;"><strong>⚡ PEA:</strong> {{ ficha.pea }} • <strong>Elemento:</strong> {{ ficha.elemento }}</small>
 
                         <!-- PERÍCIAS -->
                         <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">

@@ -45,7 +45,13 @@ class Ficha(db.Model):
     esforco = db.Column(db.Integer, default=10)
     nex = db.Column(db.Integer, default=0)
     pe_turno = db.Column(db.Integer, default=10)
-    pericias = db.Column(db.Text, default="[]")  # JSON string com [{nome, bonus}, ...]
+    pericias = db.Column(db.Text, default="[]")  # JSON
+    # Sistema Jujutsu
+    pea = db.Column(db.Integer, default=5)  # Pontos Energia Amaldiçoada
+    trilha = db.Column(db.String(100), default="Iniciante")  # Ex: Feiticeiro, Agente
+    clan = db.Column(db.String(100), default="")  # Ex: Clã Gojo, Clã Zenin
+    elemento = db.Column(db.String(50), default="Conhecimento")  # Elemento paranormal
+    rituais = db.Column(db.Text, default="[]")  # JSON com rituais aprendidos
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     def get_pericias(self):
@@ -70,6 +76,55 @@ class Ficha(db.Model):
         pericias = self.get_pericias()
         pericias = [p for p in pericias if p["nome"] != nome]
         self.set_pericias(pericias)
+
+    def get_rituais(self):
+        """Parse rituais JSON"""
+        try:
+            return json.loads(self.rituais) if self.rituais else []
+        except:
+            return []
+
+    def add_ritual(self, nome, circulo=1, elemento="Conhecimento"):
+        """Adiciona um ritual"""
+        rituais = self.get_rituais()
+        rituais.append({"nome": nome, "circulo": circulo, "elemento": elemento})
+        self.rituais = json.dumps(rituais)
+
+class Criatura(db.Model):
+    """Modelo para criaturas do compêndio"""
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), unique=True, nullable=False)
+    tipo = db.Column(db.String(50), nullable=False)  # Maldição, Criatura Paranormal, etc
+    elemento = db.Column(db.String(50), nullable=False)  # Conhecimento, Medo, Sangue, etc
+    vd = db.Column(db.Integer, nullable=False)  # Valor de Dificuldade
+    descricao = db.Column(db.Text, nullable=False)
+    habilidades = db.Column(db.Text, nullable=False)  # JSON com habilidades
+    imagem = db.Column(db.String(200), default="")
+
+class Ritual(db.Model):
+    """Modelo para rituais do compêndio"""
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), unique=True, nullable=False)
+    circulo = db.Column(db.Integer, nullable=False)  # 1-4
+    elemento = db.Column(db.String(50), nullable=False)  # Elemento paranormal
+    execucao = db.Column(db.String(50), nullable=False)  # Movimento, Padrão, etc
+    alcance = db.Column(db.String(50), nullable=False)  # Pessoal, Curto, Médio, etc
+    duracao = db.Column(db.String(50), nullable=False)  # Instantâneo, Sustentado, etc
+    descricao = db.Column(db.Text, nullable=False)
+    efeito = db.Column(db.Text, nullable=False)  # Descrição dos efeitos
+    aprimoramentos = db.Column(db.Text, default="")
+
+class ItemAmaldicoado(db.Model):
+    """Modelo para itens amaldiçoados do compêndio"""
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), unique=True, nullable=False)
+    categoria = db.Column(db.Integer, nullable=False)  # I-IV
+    elemento = db.Column(db.String(50), nullable=False)
+    tipo = db.Column(db.String(50), nullable=False)  # Arma, Armadura, Acessório, etc
+    descricao = db.Column(db.Text, nullable=False)
+    habilidades = db.Column(db.Text, nullable=False)  # JSON
+    preco = db.Column(db.String(50), default="")  # "R$ 30,00"
+    imagem = db.Column(db.String(200), default="")
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -157,6 +212,11 @@ def criar_ficha():
         esforco=10,
         nex=0,
         pe_turno=10,
+        # Sistema Jujutsu
+        pea=int(request.form.get("pea", 5)),
+        trilha=request.form.get("trilha", "Iniciante"),
+        clan=request.form.get("clan", ""),
+        elemento=request.form.get("elemento", "Conhecimento"),
         user_id=current_user.id
     )
     db.session.add(nova_ficha)
@@ -189,6 +249,11 @@ def editar_ficha(ficha_id):
             ficha.esforco = int(request.form.get("esforco", 10))
             ficha.nex = int(request.form.get("nex", 0))
             ficha.pe_turno = int(request.form.get("pe_turno", 10))
+            # Campos Jujutsu
+            ficha.pea = int(request.form.get("pea", 5))
+            ficha.trilha = request.form.get("trilha", "Iniciante")
+            ficha.clan = request.form.get("clan", "")
+            ficha.elemento = request.form.get("elemento", "Conhecimento")
             db.session.commit()
             flash("Ficha atualizada!")
             return redirect(url_for("home"))
@@ -265,6 +330,77 @@ def delete_pericia(ficha_id, nome):
     db.session.commit()
     
     return jsonify({"sucesso": True, "pericias": ficha.get_pericias()})
+
+# ========== COMPÊNDIO: Criaturas, Rituais e Itens ==========
+
+@app.route("/compendio")
+@login_required
+def compendio():
+    """Página principal do compêndio"""
+    criaturas = Criatura.query.all()
+    rituais = Ritual.query.all()
+    itens = ItemAmaldicoado.query.all()
+    return render_template("compendio.html", criaturas=criaturas, rituais=rituais, itens=itens)
+
+@app.route("/compendio/criatura/<int:criatura_id>")
+@login_required
+def view_criatura(criatura_id):
+    """Visualizar criatura específica"""
+    criatura = Criatura.query.get_or_404(criatura_id)
+    return render_template("criatura_detail.html", criatura=criatura)
+
+@app.route("/compendio/ritual/<int:ritual_id>")
+@login_required
+def view_ritual(ritual_id):
+    """Visualizar ritual específico"""
+    ritual = Ritual.query.get_or_404(ritual_id)
+    return render_template("ritual_detail.html", ritual=ritual)
+
+@app.route("/compendio/item/<int:item_id>")
+@login_required
+def view_item(item_id):
+    """Visualizar item amaldiçoado específico"""
+    item = ItemAmaldicoado.query.get_or_404(item_id)
+    return render_template("item_detail.html", item=item)
+
+@app.route("/api/compendio/buscar")
+@login_required
+def buscar_compendio():
+    """Buscar no compêndio por nome/tipo"""
+    query = request.args.get("q", "").lower()
+    tipo = request.args.get("tipo", "todos")  # criaturas, rituais, itens
+    
+    resultado = {"criaturas": [], "rituais": [], "itens": []}
+    
+    if tipo in ["todos", "criaturas"]:
+        criaturas = Criatura.query.filter(
+            db.or_(
+                Criatura.nome.ilike(f"%{query}%"),
+                Criatura.tipo.ilike(f"%{query}%"),
+                Criatura.elemento.ilike(f"%{query}%")
+            )
+        ).all()
+        resultado["criaturas"] = [{"id": c.id, "nome": c.nome, "tipo": c.tipo, "elemento": c.elemento} for c in criaturas]
+    
+    if tipo in ["todos", "rituais"]:
+        rituais = Ritual.query.filter(
+            db.or_(
+                Ritual.nome.ilike(f"%{query}%"),
+                Ritual.elemento.ilike(f"%{query}%")
+            )
+        ).all()
+        resultado["rituais"] = [{"id": r.id, "nome": r.nome, "circulo": r.circulo, "elemento": r.elemento} for r in rituais]
+    
+    if tipo in ["todos", "itens"]:
+        itens = ItemAmaldicoado.query.filter(
+            db.or_(
+                ItemAmaldicoado.nome.ilike(f"%{query}%"),
+                ItemAmaldicoado.elemento.ilike(f"%{query}%")
+            )
+        ).all()
+        resultado["itens"] = [{"id": i.id, "nome": i.nome, "categoria": i.categoria, "elemento": i.elemento} for i in itens]
+    
+    return jsonify(resultado)
 
 # -----------------------------
 # Rodar app

@@ -122,19 +122,41 @@
                 </div>
             </div>
 
-            <!-- ATRIBUTOS -->
-            <div class="form-section">
-                <h2>Atributos Principais</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Força</label>
-                        <input type="number" name="forca" value="{{ ficha.forca }}">
-                    </div>
-                    <div class="form-group">
-                        <label>Agilidade</label>
-                        <input type="number" name="agilidade" value="{{ ficha.agilidade }}">
-                    </div>
+        <!-- SISTEMA JUJUTSU -->
+        <div class="form-section">
+            <h2>🧙 Sistema Jujutsu</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Trilha</label>
+                    <select name="trilha">
+                        <option value="Iniciante" {% if ficha.trilha == "Iniciante" %}selected{% endif %}>🔰 Iniciante</option>
+                        <option value="Discente" {% if ficha.trilha == "Discente" %}selected{% endif %}>📚 Discente</option>
+                        <option value="Especial" {% if ficha.trilha == "Especial" %}selected{% endif %}>✨ Especial</option>
+                        <option value="Feiticeiro" {% if ficha.trilha == "Feiticeiro" %}selected{% endif %}>🧙 Feiticeiro</option>
+                    </select>
                 </div>
+                <div class="form-group">
+                    <label>Clã</label>
+                    <input type="text" name="clan" value="{{ ficha.clan }}" placeholder="Ex: Clã Gojo, Clã Zenin...">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Elemento Paranormal</label>
+                    <select name="elemento">
+                        <option value="Conhecimento" {% if ficha.elemento == "Conhecimento" %}selected{% endif %}>📖 Conhecimento</option>
+                        <option value="Energia" {% if ficha.elemento == "Energia" %}selected{% endif %}>⚡ Energia</option>
+                        <option value="Sangue" {% if ficha.elemento == "Sangue" %}selected{% endif %}>🩸 Sangue</option>
+                        <option value="Morte" {% if ficha.elemento == "Morte" %}selected{% endif %}>💀 Morte</option>
+                        <option value="Medo" {% if ficha.elemento == "Medo" %}selected{% endif %}>😱 Medo</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Energia Amaldiçoada (PEA)</label>
+                    <input type="number" name="pea" value="{{ ficha.pea }}" min="1">
+                </div>
+            </div>
+        </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Defesa</label>
@@ -212,6 +234,37 @@
                         </div>
                         <button type="button" onclick="adicionarPericia('{{ ficha.id }}')" style="margin-top: 18px; background: #27ae60; padding: 8px 16px; width: auto;">➕ Adicionar</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- RITUAIS -->
+            <div class="form-section">
+                <h2>🔮 Rituais Aprendidos</h2>
+                <div id="rituais-container">
+                    {% set rituais = ficha.get_rituais() %}
+                    {% if rituais %}
+                        {% for ritual in rituais %}
+                            <div class="form-row" style="align-items: center; margin-bottom: 10px;">
+                                <div class="form-group">
+                                    <label>Ritual</label>
+                                    <input type="text" value="{{ ritual.nome }}" disabled style="background: #0a0e27; color: #888; flex: 2;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Círculo</label>
+                                    <input type="number" value="{{ ritual.circulo }}" disabled style="background: #0a0e27; color: #888;">
+                                </div>
+                                <div class="form-group">
+                                    <label>Elemento</label>
+                                    <input type="text" value="{{ ritual.elemento }}" disabled style="background: #0a0e27; color: #888;">
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: #888; font-size: 13px;">Nenhum ritual aprendido. Consulte o compêndio para aprender!</p>
+                    {% endif %}
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: rgba(255, 107, 53, 0.1); border-left: 3px solid #ff6b35; border-radius: 5px;">
+                    <small style="color: #ff6b35;"><strong>💡 Dica:</strong> Acesse o <a href="/compendio" style="color: #ff8c42;">Compêndio</a> para aprender novos rituais!</small>
                 </div>
             </div>
 

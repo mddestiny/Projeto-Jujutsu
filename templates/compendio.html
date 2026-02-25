@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compêndio - Jujutsu Kaisen</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1525 100%);
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #ff6b35;
+        }
+
+        .header h1 { color: #ff6b35; font-size: 28px; }
+        .header a { color: #ff6b35; text-decoration: none; background: #1a1a2e; padding: 10px 20px; border-radius: 5px; }
+        .header a:hover { background: #ff6b35; color: #0a0e27; }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        .busca-section {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #ff6b35;
+        }
+
+        .busca-section h2 { color: #ff6b35; margin-bottom: 15px; }
+
+        .busca-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], select {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px;
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            border-radius: 5px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover { box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4); }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #444;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: #888;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            color: #ff6b35;
+            border-bottom: 3px solid #ff6b35;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .item-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .item-card:hover {
+            border-color: #ff6b35;
+            box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .item-card h3 { color: #ff6b35; margin-bottom: 10px; }
+        .item-card .tipo { font-size: 12px; color: #888; }
+        .item-card .elemento { 
+            display: inline-block;
+            background: #1a1a2e;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-top: 8px;
+            color: #4a90e2;
+        }
+
+        .circulo {
+            display: inline-block;
+            background: #ff6b35;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 2px dashed #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📚 Compêndio Jujutsu</h1>
+            <a href="/">← Voltar para Home</a>
+        </div>
+
+        <!-- BUSCA -->
+        <div class="busca-section">
+            <h2>🔍 Buscar</h2>
+            <div class="busca-group">
+                <input type="text" id="busca-input" placeholder="Digite nome, elemento, tipo...">
+                <select id="tipo-filtro">
+                    <option value="todos">Todos</option>
+                    <option value="criaturas">Criaturas</option>
+                    <option value="rituais">Rituais</option>
+                    <option value="itens">Itens</option>
+                </select>
+                <button onclick="buscar()">Buscar</button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="mostrarTab('criaturas')">⚔️ Criaturas ({{ criaturas|length }})</button>
+            <button class="tab-btn" onclick="mostrarTab('rituais')">🔮 Rituais ({{ rituais|length }})</button>
+            <button class="tab-btn" onclick="mostrarTab('itens')">📿 Itens ({{ itens|length }})</button>
+        </div>
+
+        <!-- CRIATURAS -->
+        <div id="criaturas" class="tab-content active">
+            {% if criaturas %}
+                <div class="items-grid">
+                    {% for criatura in criaturas %}
+                        <div class="item-card" onclick="open('/compendio/criatura/{{ criatura.id }}')">
+                            <h3>{{ criatura.nome }}</h3>
+                            <div class="tipo">{{ criatura.tipo }}</div>
+                            <div class="elemento">{{ criatura.elemento }} • VD {{ criatura.vd }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-message">📭 Nenhuma criatura cadastrada</div>
+            {% endif %}
+        </div>
+
+        <!-- RITUAIS -->
+        <div id="rituais" class="tab-content">
+            {% if rituais %}
+                <div class="items-grid">
+                    {% for ritual in rituais %}
+                        <div class="item-card" onclick="open('/compendio/ritual/{{ ritual.id }}')">
+                            <h3>{{ ritual.nome }} <span class="circulo">{{ ritual.circulo }}</span></h3>
+                            <div class="tipo">{{ ritual.elemento }} • {{ ritual.execucao }}</div>
+                            <div class="elemento">{{ ritual.alcance }} • {{ ritual.duracao }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-message">📭 Nenhum ritual cadastrado</div>
+            {% endif %}
+        </div>
+
+        <!-- ITENS -->
+        <div id="itens" class="tab-content">
+            {% if itens %}
+                <div class="items-grid">
+                    {% for item in itens %}
+                        <div class="item-card" onclick="open('/compendio/item/{{ item.id }}')">
+                            <h3>{{ item.nome }}</h3>
+                            <div class="tipo">{{ item.tipo }} • Categoria {{ item.categoria }}</div>
+                            <div class="elemento">{{ item.elemento }}{% if item.preco %} • {{ item.preco }}{% endif %}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-message">📭 Nenhum item cadastrado</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function mostrarTab(tabName) {
+            // Ocultar todas as abas
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            // Mostrar aba selecionada
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function buscar() {
+            const q = document.getElementById('busca-input').value;
+            const tipo = document.getElementById('tipo-filtro').value;
+            
+            fetch(`/api/compendio/buscar?q=${encodeURIComponent(q)}&tipo=${tipo}`)
+                .then(r => r.json())
+                .then(data => {
+                    console.log('Resultados:', data);
+                    alert('Busca realizada! Resultados no console.');
+                })
+                .catch(e => console.error(e));
+        }
+    </script>
+</body>
+</html>
