@@ -44,52 +44,9 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # Debug endpoints
-@app.route("/test")
-def test():
-    return "<h1>Flask está funcionando!</h1>"
-
-@app.route("/test-login-html")
-def test_login_html():
-    html = """<!DOCTYPE html>
-<html>
-<head><title>Login Teste</title></head>
-<body style="background: black; color: white; padding: 20px;">
-<h1>LOGIN TESTE - HTML DIRETO</h1>
-<form method="POST">
-    <input type="text" name="username" placeholder="usuario" required>
-    <input type="password" name="password" placeholder="senha" required>
-    <button type="submit">Entrar</button>
-</form>
-</body>
-</html>"""
-    return html
-
-@app.route("/test-login-template")
-def test_login_template():
-    try:
-        import os
-        template_path = os.path.join(os.path.dirname(__file__), 'templates', 'login.html')
-        with open(template_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        logger.info(f"Login template file size: {len(content)} bytes")
-        return content, 200, {'Content-Type': 'text/html; charset=utf-8'}
-    except Exception as e:
-        logger.error(f"Erro ao ler login.html: {str(e)}")
-        return f"<h1>Erro: {str(e)}</h1>", 500
-
-@app.route("/login-raw")
-def login_raw():
-    """Retorna login.html puro, sem render_template"""
-    try:
-        import os
-        template_path = os.path.join(os.path.dirname(__file__), 'templates', 'login.html')
-        with open(template_path, 'r', encoding='utf-8') as f:
-            html = f.read()
-        # Remover Jinja2 para teste
-        html = html.replace('{{ url_for("register") }}', '/register')
-        return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
-    except Exception as e:
-        return f"<h1>Erro: {str(e)}</h1>", 500
+@app.route("/healthcheck")
+def healthcheck():
+    return "OK", 200
 
 # -----------------------------
 # Rotas de autenticação
