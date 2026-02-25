@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import logging
+import json
+import random
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG)
@@ -43,8 +45,31 @@ class Ficha(db.Model):
     esforco = db.Column(db.Integer, default=10)
     nex = db.Column(db.Integer, default=0)
     pe_turno = db.Column(db.Integer, default=10)
-    pericias = db.Column(db.Text, default="")  # JSON string
+    pericias = db.Column(db.Text, default="[]")  # JSON string com [{nome, bonus}, ...]
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    def get_pericias(self):
+        """Parse perícias JSON para lista de dicts"""
+        try:
+            return json.loads(self.pericias) if self.pericias else []
+        except:
+            return []
+
+    def set_pericias(self, pericias_list):
+        """Salva perícias como JSON"""
+        self.pericias = json.dumps(pericias_list)
+
+    def add_pericia(self, nome, bonus=0):
+        """Adiciona uma perícia"""
+        pericias = self.get_pericias()
+        pericias.append({"nome": nome, "bonus": bonus})
+        self.set_pericias(pericias)
+
+    def remove_pericia(self, nome):
+        """Remove uma perícia"""
+        pericias = self.get_pericias()
+        pericias = [p for p in pericias if p["nome"] != nome]
+        self.set_pericias(pericias)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -192,8 +217,6 @@ def deletar_ficha(ficha_id):
 @app.route("/api/rolar-dados")
 def rolar_dados():
     """Retorna valores aleatórios de D20 para os atributos"""
-    import random
-    import json
     dados = {
         "forca": random.randint(1, 20),
         "agilidade": random.randint(1, 20),
@@ -201,7 +224,47 @@ def rolar_dados():
         "especial": random.randint(1, 20),
         "energia": random.randint(50, 100)
     }
-    return json.dumps(dados)
+    return jsonify(dados)
+
+# Endpoints para gerenciar perícias
+@app.route("/api/ficha/<int:ficha_id>/pericias", methods=["GET"])
+@login_required
+def get_pericias(ficha_id):
+    """Retorna perícias da ficha"""
+    ficha = Ficha.query.get_or_404(ficha_id)
+    if ficha.user_id != current_user.id:
+        return jsonify({"erro": "Não autorizado"}), 403
+    return jsonify(ficha.get_pericias())
+
+@app.route("/api/ficha/<int:ficha_id>/pericias", methods=["POST"])
+@login_required
+def add_pericia(ficha_id):
+    """Adiciona uma perícia"""
+    ficha = Ficha.query.get_or_404(ficha_id)
+    if ficha.user_id != current_user.id:
+        return jsonify({"erro": "Não autorizado"}), 403
+    
+    data = request.get_json()
+    nome = data.get("nome", "Nova Perícia")
+    bonus = int(data.get("bonus", 0))
+    
+    ficha.add_pericia(nome, bonus)
+    db.session.commit()
+    
+    return jsonify({"sucesso": True, "pericias": ficha.get_pericias()})
+
+@app.route("/api/ficha/<int:ficha_id>/pericias/<nome>", methods=["DELETE"])
+@login_required
+def delete_pericia(ficha_id, nome):
+    """Remove uma perícia"""
+    ficha = Ficha.query.get_or_404(ficha_id)
+    if ficha.user_id != current_user.id:
+        return jsonify({"erro": "Não autorizado"}), 403
+    
+    ficha.remove_pericia(nome)
+    db.session.commit()
+    
+    return jsonify({"sucesso": True, "pericias": ficha.get_pericias()})
 
 # -----------------------------
 # Rodar app

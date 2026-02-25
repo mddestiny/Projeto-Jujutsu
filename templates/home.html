@@ -288,6 +288,26 @@
                         <small><strong>Nível:</strong> {{ ficha.nivel }}</small><br>
                         <small><strong>Técnica:</strong> {{ ficha.tecnica }}</small>
 
+                        <!-- PERÍCIAS -->
+                        <div style="margin-top: 15px; border-top: 1px solid #444; padding-top: 10px;">
+                            <strong style="color: #ff6b35; font-size: 12px;">⚔️ Perícias:</strong>
+                            <div class="pericias-list" id="pericias-{{ ficha.id }}">
+                                {% set pericias = ficha.get_pericias() %}
+                                {% if pericias %}
+                                    {% for pericia in pericias %}
+                                        <div class="pericia-item" id="pericia-{{ loop.index }}">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0; font-size: 11px; background: #0a0e27; padding: 5px; border-radius: 3px;">
+                                                <span>{{ pericia.nome }} <strong style="color: #4a90e2;">+{{ pericia.bonus }}</strong></span>
+                                                <button type="button" class="btn-roll-pericia" onclick="rolarPericia('{{ ficha.id }}', '{{ pericia.nome }}', {{ pericia.bonus }});" style="padding: 2px 8px; font-size: 10px;">🎲</button>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p style="font-size: 11px; color: #888; margin: 5px 0;">Sem perícias</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
                         <div class="ficha-actions">
                             <a href="{{ url_for('editar_ficha', ficha_id=ficha.id) }}">✏️ Editar</a>
                             <a href="{{ url_for('deletar_ficha', ficha_id=ficha.id) }}" onclick="return confirm('Deletar essa ficha?')">🗑️ Deletar</a>
@@ -321,6 +341,13 @@
                         this.disabled = false;
                     });
             });
+        }
+
+        // Função para rolar perícia com D20 + bônus
+        function rolarPericia(fichaId, periciaNome, bonus) {
+            const d20 = Math.floor(Math.random() * 20) + 1;
+            const resultado = d20 + bonus;
+            alert(`⚔️ ${periciaNome}\n\n🎲 D20: ${d20}\n➕ Bônus: +${bonus}\n━━━━━━━━━━━\n📊 Total: ${resultado}`);
         }
     </script>
 </body>
