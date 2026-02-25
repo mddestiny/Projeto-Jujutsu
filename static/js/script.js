@@ -33,3 +33,30 @@ document.addEventListener("submit", function(e) {
         console.error('submit-handler error', err);
     }
 }, true);
+
+// Theme toggle: salva preferência em localStorage e aplica classe ao body
+(function() {
+    function applyTheme(theme) {
+        document.body.classList.remove('theme-light', 'theme-dark');
+        document.body.classList.add(theme === 'light' ? 'theme-light' : 'theme-dark');
+    }
+
+    function initTheme() {
+        const stored = localStorage.getItem('theme') || 'dark';
+        applyTheme(stored);
+        const btn = document.getElementById('themeToggle');
+        if (btn) btn.textContent = stored === 'light' ? '🌙 Dark' : '🌞 Light';
+    }
+
+    function toggleTheme() {
+        const current = document.body.classList.contains('theme-light') ? 'light' : 'dark';
+        const next = current === 'light' ? 'dark' : 'light';
+        localStorage.setItem('theme', next);
+        applyTheme(next);
+        const btn = document.getElementById('themeToggle');
+        if (btn) btn.textContent = next === 'light' ? '🌙 Dark' : '🌞 Light';
+    }
+
+    document.addEventListener('DOMContentLoaded', initTheme);
+    window.toggleTheme = toggleTheme; // função global para uso em templates
+})();

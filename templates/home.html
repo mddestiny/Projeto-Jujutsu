@@ -18,9 +18,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
+            margin-bottom: 18px;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 12px 16px;
             border-radius: 10px;
             border-left: 5px solid #ff6b35;
         }
@@ -182,14 +182,46 @@
             .form-grid { grid-template-columns: 1fr; }
             .fichas-container { grid-template-columns: 1fr; }
         }
+        /* Hero e tema */
+        .hero {
+            width: 100%;
+            max-height: 220px;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        }
+        .hero img { width: 100%; height: auto; display: block; }
+
+        /* Tema claro/escuro via classes do body */
+        .theme-light { --bg: #f5f6fb; --card: #ffffff; --muted: #666; --accent: #ff6b35; --text: #111; }
+        .theme-dark { --bg: linear-gradient(135deg, #0a0e27 0%, #1a1525 100%); --card: rgba(0,0,0,0.8); --muted: #888; --accent: #ff6b35; --text: #e0e0e0; }
+
+        body.theme-light { background: #f5f6fb; color: var(--text); }
+        body.theme-light .container { color: var(--text); }
+        body.theme-light .create-section, body.theme-light .ficha-card { background: var(--card); color: var(--text); border-color: #eee; }
+
+        /* Ajustes para dispositivos pequenos */
+        @media (max-width: 480px) {
+            .header h1 { font-size: 18px; }
+            .hero { max-height: 160px; }
+            .create-section { padding: 12px; }
+            .form-grid { gap: 10px; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- HERO -->
+        <div class="hero">
+            <img src="{{ url_for('static', filename='images/hero.svg') }}" alt="Hero">
+        </div>
+
         <!-- HEADER -->
         <div class="header">
             <h1>⚔️ Fichas C.R.I.S. - Ordem Paranormal</h1>
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 8px; align-items:center;">
+                <button id="themeToggle" onclick="toggleTheme()" style="background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:6px;cursor:pointer">🌞</button>
                 <a href="/compendio">📚 Compêndio</a>
                 <a href="/logout">🚪 Logout</a>
             </div>
