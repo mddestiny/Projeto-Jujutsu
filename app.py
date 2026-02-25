@@ -67,12 +67,29 @@ def test_login_html():
 @app.route("/test-login-template")
 def test_login_template():
     try:
-        result = render_template("login.html")
-        logger.info(f"Login template size: {len(result)} bytes")
-        return result
+        import os
+        template_path = os.path.join(os.path.dirname(__file__), 'templates', 'login.html')
+        with open(template_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        logger.info(f"Login template file size: {len(content)} bytes")
+        return content, 200, {'Content-Type': 'text/html; charset=utf-8'}
     except Exception as e:
-        logger.error(f"Erro ao renderizar login.html: {str(e)}")
-        return f"<h1>Erro: {str(e)}</h1><p>Traceback:</p><pre>{str(e)}</pre>", 500
+        logger.error(f"Erro ao ler login.html: {str(e)}")
+        return f"<h1>Erro: {str(e)}</h1>", 500
+
+@app.route("/login-raw")
+def login_raw():
+    """Retorna login.html puro, sem render_template"""
+    try:
+        import os
+        template_path = os.path.join(os.path.dirname(__file__), 'templates', 'login.html')
+        with open(template_path, 'r', encoding='utf-8') as f:
+            html = f.read()
+        # Remover Jinja2 para teste
+        html = html.replace('{{ url_for("register") }}', '/register')
+        return html, 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except Exception as e:
+        return f"<h1>Erro: {str(e)}</h1>", 500
 
 # -----------------------------
 # Rotas de autenticação
