@@ -141,6 +141,8 @@ def healthcheck():
 @app.route("/register", methods=["GET","POST"])
 def register():
     try:
+        if current_user.is_authenticated:
+            return redirect(url_for("home"))
         if request.method == "POST":
             username = request.form["username"]
             password = request.form["password"]
@@ -160,6 +162,8 @@ def register():
 @app.route("/login", methods=["GET","POST"])
 def login():
     try:
+        if current_user.is_authenticated:
+            return redirect(url_for("home"))
         if request.method == "POST":
             username = request.form["username"]
             password = request.form["password"]

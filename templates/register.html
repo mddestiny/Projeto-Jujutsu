@@ -145,7 +145,7 @@ button:active {
 <body>
     <div class="container">
         <h1>🔥 CRIAR CONTA 🔥</h1>
-        <form method="POST">
+        <form id="registerForm" method="POST" action="/register">
             <div class="form-group">
                 <label for="username">Usuário:</label>
                 <input type="text" id="username" name="username" placeholder="Escolha um usuário" required autofocus>
@@ -154,8 +154,9 @@ button:active {
                 <label for="password">Senha:</label>
                 <input type="password" id="password" name="password" placeholder="Crie uma senha forte" required>
             </div>
-            <button type="submit">Criar Conta</button>
+            <button type="submit" id="registerSubmit">Criar Conta</button>
         </form>
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
         <div class="form-footer">
             <p>Já tem conta? <a href="/login">Faça login aqui</a></p>
         </div>

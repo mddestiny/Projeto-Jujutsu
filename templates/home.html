@@ -324,10 +324,10 @@
                                 {% set pericias = ficha.get_pericias() %}
                                 {% if pericias %}
                                     {% for pericia in pericias %}
-                                        <div class="pericia-item" id="pericia-{{ loop.index }}">
+                                        <div class="pericia-item" id="pericia-{{ ficha.id }}-{{ loop.index }}">
                                             <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0; font-size: 11px; background: #0a0e27; padding: 5px; border-radius: 3px;">
                                                 <span>{{ pericia.nome }} <strong style="color: #4a90e2;">+{{ pericia.bonus }}</strong></span>
-                                                <button type="button" class="btn-roll-pericia" onclick="rolarPericia('{{ ficha.id }}', '{{ pericia.nome }}', {{ pericia.bonus }});" style="padding: 2px 8px; font-size: 10px;">🎲</button>
+                                                <button type="button" class="btn-roll-pericia" data-ficha-id="{{ ficha.id }}" data-pericia-nome="{{ pericia.nome }}" data-pericia-bonus="{{ pericia.bonus }}" onclick="rolarPericiaFromButton(this)" style="padding: 2px 8px; font-size: 10px;">🎲</button>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -370,6 +370,14 @@
                         this.disabled = false;
                     });
             });
+        }
+
+        // Função auxiliar: usa data-attributes do botão para rolar
+        function rolarPericiaFromButton(btn) {
+            const fichaId = btn.dataset.fichaId;
+            const periciaNome = btn.dataset.periciaNome;
+            const bonus = parseInt(btn.dataset.periciaBonus) || 0;
+            rolarPericia(fichaId, periciaNome, bonus);
         }
 
         // Função para rolar perícia com D20 + bônus
