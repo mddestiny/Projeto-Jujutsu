@@ -169,6 +169,21 @@ def deletar_ficha(ficha_id):
         logger.error(f"Erro em deletar_ficha: {str(e)}")
         return f"<h1>Erro: {str(e)}</h1>", 500
 
+# Endpoint para rolar dados D20
+@app.route("/api/rolar-dados")
+def rolar_dados():
+    """Retorna valores aleatórios de D20 para os atributos"""
+    import random
+    import json
+    dados = {
+        "forca": random.randint(1, 20),
+        "agilidade": random.randint(1, 20),
+        "defesa": random.randint(1, 20),
+        "especial": random.randint(1, 20),
+        "energia": random.randint(50, 100)
+    }
+    return json.dumps(dados)
+
 # -----------------------------
 # Rodar app
 # -----------------------------
