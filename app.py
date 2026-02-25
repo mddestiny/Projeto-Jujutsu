@@ -64,17 +64,15 @@ def test_login_html():
 </html>"""
     return html
 
-@app.route("/debug")
-def debug_info():
-    import os
-    template_path = os.path.join(os.path.dirname(__file__), 'templates')
-    files = os.listdir(template_path) if os.path.exists(template_path) else "NÃO ENCONTRADO"
-    return f"""
-    <h1>DEBUG INFO</h1>
-    <p>Template Path: {template_path}</p>
-    <p>Files: {files}</p>
-    <p>PWD: {os.getcwd()}</p>
-    """
+@app.route("/test-login-template")
+def test_login_template():
+    try:
+        result = render_template("login.html")
+        logger.info(f"Login template size: {len(result)} bytes")
+        return result
+    except Exception as e:
+        logger.error(f"Erro ao renderizar login.html: {str(e)}")
+        return f"<h1>Erro: {str(e)}</h1><p>Traceback:</p><pre>{str(e)}</pre>", 500
 
 # -----------------------------
 # Rotas de autenticação
