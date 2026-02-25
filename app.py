@@ -33,10 +33,17 @@ class Ficha(db.Model):
     energia = db.Column(db.Integer, nullable=False)
     tecnica = db.Column(db.String(200), nullable=False)
     habilidades = db.Column(db.Text, nullable=False)
-    forca = db.Column(db.Integer, default=50)
-    agilidade = db.Column(db.Integer, default=50)
-    defesa = db.Column(db.Integer, default=50)
+    forca = db.Column(db.Integer, default=10)
+    agilidade = db.Column(db.Integer, default=10)
+    defesa = db.Column(db.Integer, default=10)
     especial = db.Column(db.String(200), default="")
+    # Campos C.R.I.S.
+    vida = db.Column(db.Integer, default=20)
+    sanidade = db.Column(db.Integer, default=20)
+    esforco = db.Column(db.Integer, default=10)
+    nex = db.Column(db.Integer, default=0)
+    pe_turno = db.Column(db.Integer, default=10)
+    pericias = db.Column(db.Text, default="")  # JSON string
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
 @login_manager.user_loader
@@ -112,13 +119,19 @@ def criar_ficha():
         nome=request.form.get("nome"),
         cla=request.form.get("cla"),
         nivel=request.form.get("nivel"),
-        energia=int(request.form.get("energia")),
+        energia=int(request.form.get("energia", 50)),
         tecnica=request.form.get("tecnica"),
         habilidades=request.form.get("habilidades"),
-        forca=int(request.form.get("forca",50)),
-        agilidade=int(request.form.get("agilidade",50)),
-        defesa=int(request.form.get("defesa",50)),
-        especial=request.form.get("especial",""),
+        forca=int(request.form.get("forca", 10)),
+        agilidade=int(request.form.get("agilidade", 10)),
+        defesa=int(request.form.get("defesa", 10)),
+        especial=request.form.get("especial", ""),
+        # Campos C.R.I.S.
+        vida=20,
+        sanidade=20,
+        esforco=10,
+        nex=0,
+        pe_turno=10,
         user_id=current_user.id
     )
     db.session.add(nova_ficha)
@@ -138,13 +151,19 @@ def editar_ficha(ficha_id):
             ficha.nome = request.form.get("nome")
             ficha.cla = request.form.get("cla")
             ficha.nivel = request.form.get("nivel")
-            ficha.energia = int(request.form.get("energia"))
+            ficha.energia = int(request.form.get("energia", 50))
             ficha.tecnica = request.form.get("tecnica")
             ficha.habilidades = request.form.get("habilidades")
-            ficha.forca = int(request.form.get("forca"))
-            ficha.agilidade = int(request.form.get("agilidade"))
-            ficha.defesa = int(request.form.get("defesa"))
-            ficha.especial = request.form.get("especial")
+            ficha.forca = int(request.form.get("forca", 10))
+            ficha.agilidade = int(request.form.get("agilidade", 10))
+            ficha.defesa = int(request.form.get("defesa", 10))
+            ficha.especial = request.form.get("especial", "")
+            # Novos campos C.R.I.S.
+            ficha.vida = int(request.form.get("vida", 20))
+            ficha.sanidade = int(request.form.get("sanidade", 20))
+            ficha.esforco = int(request.form.get("esforco", 10))
+            ficha.nex = int(request.form.get("nex", 0))
+            ficha.pe_turno = int(request.form.get("pe_turno", 10))
             db.session.commit()
             flash("Ficha atualizada!")
             return redirect(url_for("home"))

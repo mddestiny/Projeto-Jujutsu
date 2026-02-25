@@ -1,108 +1,308 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jujutsu Kaisen - Fichas</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Fichas C.R.I.S. - Ordem Paranormal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1525 100%);
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #ff6b35;
+        }
+
+        .header h1 { color: #ff6b35; font-size: 28px; }
+        .header a { color: #ff6b35; text-decoration: none; background: #1a1a2e; padding: 10px 20px; border-radius: 5px; }
+        .header a:hover { background: #ff6b35; color: #0a0e27; }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        /* CRIAR FICHA */
+        .create-section {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #ff6b35;
+        }
+
+        .create-section h2 { color: #ff6b35; margin-bottom: 15px; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label { color: #888; font-size: 12px; margin-bottom: 5px; }
+        .form-group input, .form-group select, .form-group textarea {
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group textarea { resize: vertical; min-height: 60px; }
+
+        button {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4); }
+        button:active { transform: translateY(0); }
+
+        button.btn-rolar {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        button.btn-rolar:hover { box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4); }
+
+        /* LISTA DE FICHAS */
+        .fichas-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .ficha-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #444;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .ficha-card:hover { border-color: #ff6b35; box-shadow: 0 0 20px rgba(255, 107, 53, 0.3); }
+
+        .ficha-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ff6b35;
+            padding-bottom: 10px;
+        }
+
+        .ficha-header h3 { color: #ff6b35; }
+        .ficha-header .classe { background: #1a1a2e; padding: 5px 10px; border-radius: 3px; font-size: 12px; }
+
+        .atributos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .atributo {
+            background: #1a1a2e;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #4a90e2;
+        }
+
+        .atributo-label { color: #888; font-size: 11px; }
+        .atributo-valor { color: #ff6b35; font-weight: bold; font-size: 18px; }
+
+        .pericias-list {
+            background: #1a1a2e;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .pericia { display: flex; justify-content: space-between; margin: 5px 0; font-size: 12px; }
+
+        .ficha-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .ficha-actions a, .ficha-actions button {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            background: #1a1a2e;
+            color: #ff6b35;
+            border: 1px solid #ff6b35;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ficha-actions a:hover, .ficha-actions button:hover {
+            background: #ff6b35;
+            color: #1a1a2e;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 2px dashed #444;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .fichas-container { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
+        <!-- HEADER -->
         <div class="header">
-            <h1>Jujutsu Kaisen - Gerenciador de Fichas</h1>
-            <a href="{{ url_for('logout') }}" class="btn btn-logout">Logout</a>
+            <h1>⚔️ Fichas C.R.I.S. - Ordem Paranormal</h1>
+            <a href="/logout">🚪 Logout</a>
         </div>
 
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-info">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+        <!-- CRIAR FICHA -->
+        <div class="create-section">
+            <h2>📋 Criar Nova Ficha</h2>
+            <form method="POST" action="{{ url_for('criar_ficha') }}">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" name="nome" placeholder="Nome do personagem" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Classe/Arquétipo</label>
+                        <input type="text" name="cla" placeholder="Ex: Mago, Guerreiro..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nível</label>
+                        <input type="text" name="nivel" placeholder="1, 2, 3..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Energia</label>
+                        <input type="number" name="energia" placeholder="0-100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Técnica</label>
+                        <input type="text" name="tecnica" placeholder="Habilidade principal" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Habilidades</label>
+                        <textarea name="habilidades" placeholder="Listar habilidades..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Força</label>
+                        <input type="number" name="forca" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Agilidade</label>
+                        <input type="number" name="agilidade" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Especial</label>
+                        <input type="text" name="especial" placeholder="Habilidade especial">
+                    </div>
+                </div>
+                <button type="submit">✨ Criar Personagem</button>
+                <button type="button" class="btn-rolar" id="rolar-dados">🎲 Rolar Dados</button>
+            </form>
+        </div>
 
-        <div class="content">
-            <div class="novo-personagem">
-                <h2>Criar Novo Personagem</h2>
-                <form method="POST" action="{{ url_for('criar_ficha') }}">
-                    <div class="form-group">
-                        <label for="nome">Nome:</label>
-                        <input type="text" name="nome" id="nome" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cla">Classe:</label>
-                        <input type="text" name="cla" id="cla" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="nivel">Nível:</label>
-                        <input type="text" name="nivel" id="nivel" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="energia">Energia:</label>
-                        <input type="number" name="energia" id="energia" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="tecnica">Técnica:</label>
-                        <input type="text" name="tecnica" id="tecnica" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="habilidades">Habilidades:</label>
-                        <textarea name="habilidades" id="habilidades" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="forca">Força:</label>
-                        <input type="number" name="forca" id="forca" value="50">
-                    </div>
-                    <div class="form-group">
-                        <label for="agilidade">Agilidade:</label>
-                        <input type="number" name="agilidade" id="agilidade" value="50">
-                    </div>
-                    <div class="form-group">
-                        <label for="defesa">Defesa:</label>
-                        <input type="number" name="defesa" id="defesa" value="50">
-                    </div>
-                    <div class="form-group">
-                        <label for="especial">Especial:</label>
-                        <input type="text" name="especial" id="especial">
-                    </div>
-                    <div class="form-group">
-                        <button type="button" id="rolar-dados" class="btn btn-rolar">🎲 Rolar Dados</button>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Criar Personagem</button>
-                </form>
-            </div>
+        <!-- LISTA DE FICHAS -->
+        <h2 style="margin-bottom: 20px; color: #ff6b35;">⚔️ Seus Personagens</h2>
+        <div class="fichas-container">
+            {% if fichas %}
+                {% for ficha in fichas %}
+                    <div class="ficha-card">
+                        <div class="ficha-header">
+                            <h3>{{ ficha.nome }}</h3>
+                            <span class="classe">{{ ficha.cla }}</span>
+                        </div>
 
-            <div class="fichas-list">
-                <h2>Seus Personagens</h2>
-                {% if fichas %}
-                    <div class="fichas-grid">
-                        {% for ficha in fichas %}
-                            <div class="ficha-card">
-                                <h3>{{ ficha.nome }}</h3>
-                                <p><strong>Classe:</strong> {{ ficha.cla }}</p>
-                                <p><strong>Nível:</strong> {{ ficha.nivel }}</p>
-                                <p><strong>Energia:</strong> {{ ficha.energia }}</p>
-                                <p><strong>Técnica:</strong> {{ ficha.tecnica }}</p>
-                                <p><strong>Força:</strong> {{ ficha.forca }}</p>
-                                <p><strong>Agilidade:</strong> {{ ficha.agilidade }}</p>
-                                <p><strong>Defesa:</strong> {{ ficha.defesa }}</p>
-                                {% if ficha.especial %}
-                                    <p><strong>Especial:</strong> {{ ficha.especial }}</p>
-                                {% endif %}
-                                <div class="actions">
-                                    <a href="{{ url_for('editar_ficha', ficha_id=ficha.id) }}" class="btn btn-secondary">Editar</a>
-                                    <a href="{{ url_for('deletar_ficha', ficha_id=ficha.id) }}" class="btn btn-danger">Deletar</a>
-                                </div>
+                        <div class="atributos-grid">
+                            <div class="atributo">
+                                <div class="atributo-label">Força</div>
+                                <div class="atributo-valor">{{ ficha.forca }}</div>
                             </div>
-                        {% endfor %}
+                            <div class="atributo">
+                                <div class="atributo-label">Agilidade</div>
+                                <div class="atributo-valor">{{ ficha.agilidade }}</div>
+                            </div>
+                            <div class="atributo">
+                                <div class="atributo-label">Defesa</div>
+                                <div class="atributo-valor">{{ ficha.defesa }}</div>
+                            </div>
+                            <div class="atributo">
+                                <div class="atributo-label">Vida</div>
+                                <div class="atributo-valor">{{ ficha.vida }}</div>
+                            </div>
+                            <div class="atributo">
+                                <div class="atributo-label">Sanidade</div>
+                                <div class="atributo-valor">{{ ficha.sanidade }}</div>
+                            </div>
+                            <div class="atributo">
+                                <div class="atributo-label">Esforço</div>
+                                <div class="atributo-valor">{{ ficha.esforco }}</div>
+                            </div>
+                            <div class="atributo">
+                                <div class="atributo-label">NEX</div>
+                                <div class="atributo-valor">{{ ficha.nex }}</div>
+                            </div>
+                            <div class="atributo">
+                                <div class="atributo-label">PE/Turno</div>
+                                <div class="atributo-valor">{{ ficha.pe_turno }}</div>
+                            </div>
+                        </div>
+
+                        <small><strong>Nível:</strong> {{ ficha.nivel }}</small><br>
+                        <small><strong>Técnica:</strong> {{ ficha.tecnica }}</small>
+
+                        <div class="ficha-actions">
+                            <a href="{{ url_for('editar_ficha', ficha_id=ficha.id) }}">✏️ Editar</a>
+                            <a href="{{ url_for('deletar_ficha', ficha_id=ficha.id) }}" onclick="return confirm('Deletar essa ficha?')">🗑️ Deletar</a>
+                        </div>
                     </div>
-                {% else %}
-                    <p>Nenhum personagem criado ainda. Crie um novo para começar!</p>
-                {% endif %}
-            </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-message">
+                    📭 Você não possui personagens ainda.<br>
+                    Crie um novo acima para começar!
+                </div>
+            {% endif %}
         </div>
     </div>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
     <script>
         const botaoRolar = document.getElementById('rolar-dados');
         if (botaoRolar) {
@@ -113,10 +313,8 @@
                 fetch('/api/rolar-dados')
                     .then(r => r.json())
                     .then(dados => {
-                        document.getElementById('forca').value = dados.forca;
-                        document.getElementById('agilidade').value = dados.agilidade;
-                        document.getElementById('defesa').value = dados.defesa;
-                        document.getElementById('energia').value = dados.energia;
+                        document.querySelector('input[name="forca"]').value = dados.forca;
+                        document.querySelector('input[name="agilidade"]').value = dados.agilidade;
                     })
                     .finally(() => {
                         this.textContent = '🎲 Rolar Dados';

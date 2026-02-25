@@ -1,30 +1,194 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Editar Ficha - Jujutsu</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Ficha - Ordem Paranormal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1525 100%);
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 600px; margin: auto; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #ff6b35;
+        }
+
+        .header h1 { color: #ff6b35; }
+        .header a { color: #ff6b35; text-decoration: none; }
+
+        .form-section {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #444;
+            margin-bottom: 20px;
+        }
+
+        .form-section h2 { color: #ff6b35; margin-bottom: 15px; font-size: 16px; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+        }
+
+        .form-group label { color: #888; font-size: 12px; margin-bottom: 5px; }
+        .form-group input, .form-group textarea {
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4); }
+
+        .btn-voltar {
+            background: #1a1a2e;
+            color: #ff6b35;
+            border: 1px solid #ff6b35;
+            margin-bottom: 20px;
+        }
+
+        .btn-voltar:hover { background: #ff6b35; color: #1a1a2e; }
+    </style>
 </head>
 <body>
-<div class="container">
-<form method="POST">
-<h1>Editar Ficha 🔥</h1>
-<label>Nome:</label><input type="text" name="nome" value="{{ ficha.nome }}" required>
-<label>Clã:</label>
-<select name="cla">
-<option value="Gojo" {% if ficha.cla=="Gojo" %}selected{% endif %}>Gojo</option>
-<option value="Zenin" {% if ficha.cla=="Zenin" %}selected{% endif %}>Zenin</option>
-<option value="Kamo" {% if ficha.cla=="Kamo" %}selected{% endif %}>Kamo</option>
-<option value="Fushiguro" {% if ficha.cla=="Fushiguro" %}selected{% endif %}>Fushiguro</option>
-</select>
-<label>Nível:</label><input type="text" name="nivel" value="{{ ficha.nivel }}" required>
-<label>Energia (0-100):</label><input type="number" name="energia" min="0" max="100" value="{{ ficha.energia }}" required>
-<label>Técnica:</label><input type="text" name="tecnica" value="{{ ficha.tecnica }}" required>
-<label>Habilidades:</label><textarea name="habilidades" required>{{ ficha.habilidades }}</textarea>
-<button type="submit">Atualizar Ficha</button>
-</form>
-<a href="{{ url_for('home') }}">Voltar</a>
-</div>
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <div class="container">
+        <div class="header">
+            <h1>✏️ Editar Ficha</h1>
+            <span class="classe">{{ ficha.cla }}</span>
+        </div>
+
+        <a href="/" class="btn-voltar" style="display: block; text-align: center; padding: 10px; border-radius: 5px; text-decoration: none; margin-bottom: 20px;">← Voltar</a>
+
+        <form method="POST">
+            <!-- INFORMAÇÕES BÁSICAS -->
+            <div class="form-section">
+                <h2>Informações Básicas</h2>
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" name="nome" value="{{ ficha.nome }}" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Classe/Arquétipo</label>
+                        <input type="text" name="cla" value="{{ ficha.cla }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nível</label>
+                        <input type="text" name="nivel" value="{{ ficha.nivel }}" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Técnica</label>
+                    <input type="text" name="tecnica" value="{{ ficha.tecnica }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Especialidade</label>
+                    <input type="text" name="especial" value="{{ ficha.especial }}">
+                </div>
+            </div>
+
+            <!-- ATRIBUTOS -->
+            <div class="form-section">
+                <h2>Atributos Principais</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Força</label>
+                        <input type="number" name="forca" value="{{ ficha.forca }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Agilidade</label>
+                        <input type="number" name="agilidade" value="{{ ficha.agilidade }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Defesa</label>
+                        <input type="number" name="defesa" value="{{ ficha.defesa }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Energia</label>
+                        <input type="number" name="energia" value="{{ ficha.energia }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECURSOS DO PERSONAGEM -->
+            <div class="form-section">
+                <h2>Recursos</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Vida</label>
+                        <input type="number" name="vida" value="{{ ficha.vida }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Sanidade</label>
+                        <input type="number" name="sanidade" value="{{ ficha.sanidade }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Esforço</label>
+                        <input type="number" name="esforco" value="{{ ficha.esforco }}">
+                    </div>
+                    <div class="form-group">
+                        <label>PE/Turno</label>
+                        <input type="number" name="pe_turno" value="{{ ficha.pe_turno }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>NEX (Nível de Experiência)</label>
+                        <input type="number" name="nex" value="{{ ficha.nex }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESCRIÇÃO -->
+            <div class="form-section">
+                <h2>Descrição e Habilidades</h2>
+                <div class="form-group">
+                    <label>Habilidades e Perícias</label>
+                    <textarea name="habilidades" required>{{ ficha.habilidades }}</textarea>
+                </div>
+            </div>
+
+            <button type="submit">✅ Salvar Alterações</button>
+        </form>
+    </div>
 </body>
 </html>
