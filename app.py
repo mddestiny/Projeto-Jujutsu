@@ -80,7 +80,7 @@ def logout():
 @login_required
 def home():
     fichas = Ficha.query.filter_by(user_id=current_user.id).all()
-    return render_template("index.html", fichas=fichas)
+    return render_template("home.html", fichas=fichas)
 
 @app.route("/criar_ficha", methods=["POST"])
 @login_required
