@@ -1,0 +1,24 @@
+%% Mini-diagrama Mermaid do fluxo de login/registro
+flowchart LR
+  A[Usuário visita /] --> B{Está autenticado?}
+  B -- Não --> C[/login]
+  B -- Sim --> D[/home]
+  C --> E[Formulário de login]
+  E --> F[POST /login]
+  F --> G{Credenciais válidas?}
+  G -- Sim --> H[login_user -> redirect /home]
+  G -- Não --> I[Flash erro -> mostrar /login]
+
+  subgraph Registro
+    R1[/register] --> R2[Formulário registro]
+    R2 --> R3[POST /register]
+    R3 --> R4{Usuário existe?}
+    R4 -- Sim --> R5[Flash erro]
+    R4 -- Não --> R6[Cria usuário -> redirect /login]
+  end
+
+  note left of F: Problema observado
+  note left of F: múltiplos POSTs consecutivos
+
+  style H fill:#dff0d8,stroke:#3c763d
+  style I fill:#f2dede,stroke:#a94442

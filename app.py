@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -416,6 +416,19 @@ def buscar_compendio():
         resultado["itens"] = [{"id": i.id, "nome": i.nome, "categoria": i.categoria, "elemento": i.elemento} for i in itens]
     
     return jsonify(resultado)
+
+
+# Serve a simple SVG favicon at /favicon.ico to avoid 404s from browsers
+@app.route('/favicon.ico')
+def favicon():
+    svg = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">'
+        '<rect width="48" height="48" fill="#000"/>'
+        '<text x="50%" y="50%" fill="#ff4444" font-family="Arial, sans-serif" font-size="24" text-anchor="middle" dominant-baseline="central">J</text>'
+        '</svg>'
+    )
+    return Response(svg, mimetype='image/svg+xml')
 
 # -----------------------------
 # Rodar app
