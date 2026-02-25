@@ -11,6 +11,12 @@ import random
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+def to_int(value, default=0):
+    """Converte para int com fallback seguro."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "jujutsu_secreto"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
@@ -58,7 +64,8 @@ class Ficha(db.Model):
         """Parse perícias JSON para lista de dicts"""
         try:
             return json.loads(self.pericias) if self.pericias else []
-        except:
+        except Exception as e:
+            logger.error(f"Erro ao parsear perícias da ficha {self.id}: {e}")
             return []
 
     def set_pericias(self, pericias_list):
@@ -81,7 +88,8 @@ class Ficha(db.Model):
         """Parse rituais JSON"""
         try:
             return json.loads(self.rituais) if self.rituais else []
-        except:
+        except Exception as e:
+            logger.error(f"Erro ao parsear rituais da ficha {self.id}: {e}")
             return []
 
     def add_ritual(self, nome, circulo=1, elemento="Conhecimento"):
@@ -203,12 +211,12 @@ def criar_ficha():
         nome=request.form.get("nome"),
         cla=request.form.get("cla"),
         nivel=request.form.get("nivel"),
-        energia=int(request.form.get("energia", 50)),
+        energia=to_int(request.form.get("energia"), 50),
         tecnica=request.form.get("tecnica"),
         habilidades=request.form.get("habilidades"),
-        forca=int(request.form.get("forca", 10)),
-        agilidade=int(request.form.get("agilidade", 10)),
-        defesa=int(request.form.get("defesa", 10)),
+        forca=to_int(request.form.get("forca"), 10),
+        agilidade=to_int(request.form.get("agilidade"), 10),
+        defesa=to_int(request.form.get("defesa"), 10),
         especial=request.form.get("especial", ""),
         # Campos C.R.I.S.
         vida=20,
@@ -217,7 +225,7 @@ def criar_ficha():
         nex=0,
         pe_turno=10,
         # Sistema Jujutsu
-        pea=int(request.form.get("pea", 5)),
+        pea=to_int(request.form.get("pea"), 5),
         trilha=request.form.get("trilha", "Iniciante"),
         clan=request.form.get("clan", ""),
         elemento=request.form.get("elemento", "Conhecimento"),
@@ -243,18 +251,19 @@ def editar_ficha(ficha_id):
             ficha.energia = int(request.form.get("energia", 50))
             ficha.tecnica = request.form.get("tecnica")
             ficha.habilidades = request.form.get("habilidades")
-            ficha.forca = int(request.form.get("forca", 10))
-            ficha.agilidade = int(request.form.get("agilidade", 10))
-            ficha.defesa = int(request.form.get("defesa", 10))
+            ficha.energia = to_int(request.form.get("energia"), 50)
+            ficha.forca = to_int(request.form.get("forca"), 10)
+            ficha.agilidade = to_int(request.form.get("agilidade"), 10)
+            ficha.defesa = to_int(request.form.get("defesa"), 10)
             ficha.especial = request.form.get("especial", "")
             # Novos campos C.R.I.S.
-            ficha.vida = int(request.form.get("vida", 20))
-            ficha.sanidade = int(request.form.get("sanidade", 20))
-            ficha.esforco = int(request.form.get("esforco", 10))
-            ficha.nex = int(request.form.get("nex", 0))
-            ficha.pe_turno = int(request.form.get("pe_turno", 10))
+            ficha.vida = to_int(request.form.get("vida"), 20)
+            ficha.sanidade = to_int(request.form.get("sanidade"), 20)
+            ficha.esforco = to_int(request.form.get("esforco"), 10)
+            ficha.nex = to_int(request.form.get("nex"), 0)
+            ficha.pe_turno = to_int(request.form.get("pe_turno"), 10)
             # Campos Jujutsu
-            ficha.pea = int(request.form.get("pea", 5))
+            ficha.pea = to_int(request.form.get("pea"), 5)
             ficha.trilha = request.form.get("trilha", "Iniciante")
             ficha.clan = request.form.get("clan", "")
             ficha.elemento = request.form.get("elemento", "Conhecimento")
@@ -312,11 +321,13 @@ def add_pericia(ficha_id):
     ficha = Ficha.query.get_or_404(ficha_id)
     if ficha.user_id != current_user.id:
         return jsonify({"erro": "Não autorizado"}), 403
-    
-    data = request.get_json()
+    data = request.get_json() or {}
+    if not isinstance(data, dict):
+        return jsonify({"erro": "JSON inválido"}), 400
+
     nome = data.get("nome", "Nova Perícia")
-    bonus = int(data.get("bonus", 0))
-    
+    bonus = to_int(data.get("bonus", 0), 0)
+
     ficha.add_pericia(nome, bonus)
     db.session.commit()
     
