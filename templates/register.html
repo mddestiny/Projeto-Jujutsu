@@ -144,7 +144,18 @@ button:active {
 </head>
 <body>
     <div class="container">
-        <h1>🔥 CRIAR CONTA 🔥</h1>
+        <div class="hero">
+            <img src="{{ url_for('static', filename='images/hero.jpg') }}" alt="Hero" onerror="this.src='{{ url_for('static', filename='images/hero.svg') }}'">
+        </div>
+
+        <div class="header">
+            <h1>🔥 CRIAR CONTA 🔥</h1>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button id="themeToggle" onclick="toggleTheme()" style="background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:6px;cursor:pointer">🌞</button>
+                <a href="/login">Fazer login</a>
+            </div>
+        </div>
+
         <form id="registerForm" method="POST" action="/register">
             <div class="form-group">
                 <label for="username">Usuário:</label>

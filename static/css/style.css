@@ -82,3 +82,27 @@ button:hover { transform: scale(1.05); box-shadow: 0 0 20px red; }
 .cla-zenin { box-shadow: 0 0 20px green; }
 .cla-kamo { box-shadow: 0 0 20px purple; }
 .cla-fushiguro { box-shadow: 0 0 20px blue; }
+
+/* Theme variables and extra themes */
+:root {
+    --bg-dark: #070614;
+    --card-dark: rgba(0,0,0,0.85);
+    --muted-dark: #888;
+    --accent: #ff6b35;
+    --text-dark: #eaeaea;
+}
+
+body.theme-dark { background: var(--bg-dark); color: var(--text-dark); }
+body.theme-light { background: #f5f6fb; color: #111; }
+
+/* Example alternate theme: green */
+body.theme-green { background: linear-gradient(135deg,#072b12,#0b3d1e); color: #eaf7ea; }
+body.theme-green .card, body.theme-green .container, body.theme-green form { background: rgba(5,20,10,0.85); }
+
+/* Make hero area responsive (used by templates) */
+.hero { width: 100%; max-height: 220px; overflow: hidden; border-radius: 12px; margin-bottom: 18px; }
+.hero img { width: 100%; height: auto; display: block; }
+
+@media (max-width: 480px) {
+    .hero { max-height: 140px; }
+}
